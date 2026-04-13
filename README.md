@@ -1,6 +1,5 @@
 # Archiver
 Archiver is a modern, lightweight, and high-performance macOS utility designed for seamless file compression and extraction. Built with SwiftUI and optimized for macOS 14+, it provides a clean, native experience for managing various archive formats while specifically addressing common issues like garbled character encoding in CJK (Chinese, Japanese, Korean) filenames.
-+2
 
 ## 🚀 Features
 ### Multi-Format Support: 
