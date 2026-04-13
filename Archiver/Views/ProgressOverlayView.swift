@@ -21,7 +21,7 @@ struct ProgressOverlayView: View {
                 Image(systemName: isCompressing ? "archivebox.fill" : "arrow.down.doc.fill")
                     .font(.system(size: 40))
                     .foregroundStyle(.tint)
-                    .symbolEffect(.bounce, options: .repeating)
+                    .modifier(BounceEffectModifier())
 
                 Text(isCompressing ? "Compressing…" : "Extracting…")
                     .font(.title2.bold())
@@ -69,6 +69,16 @@ struct ProgressOverlayView: View {
             return (progress, file)
         default:
             return nil
+        }
+    }
+}
+
+private struct BounceEffectModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(macOS 15.0, *) {
+            content.symbolEffect(.bounce, options: .repeating)
+        } else {
+            content
         }
     }
 }

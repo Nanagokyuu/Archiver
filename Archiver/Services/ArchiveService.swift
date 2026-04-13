@@ -32,9 +32,7 @@ actor ArchiveService {
     // MARK: - ZIP Reading
 
     private func readZipContents(at url: URL) throws -> [ArchiveItem] {
-        guard let archive = Archive(url: url, accessMode: .read) else {
-            throw ArchiveError.cannotOpenArchive
-        }
+        let archive = try Archive(url: url, accessMode: .read)
 
         return archive.compactMap { entry in
             let rawPath = entry.path
@@ -210,9 +208,7 @@ actor ArchiveService {
         to destination: URL,
         progressHandler: @escaping @Sendable (Double, String) -> Void
     ) async throws {
-        guard let archive = Archive(url: archiveURL, accessMode: .read) else {
-            throw ArchiveError.cannotOpenArchive
-        }
+        let archive = try Archive(url: archiveURL, accessMode: .read)
 
         let entries = Array(archive)
         let totalEntries = entries.count
@@ -286,9 +282,7 @@ actor ArchiveService {
         to destination: URL,
         progressHandler: @escaping @Sendable (Double, String) -> Void
     ) async throws {
-        guard let archive = Archive(url: destination, accessMode: .create) else {
-            throw ArchiveError.cannotCreateArchive
-        }
+        let archive = try Archive(url: destination, accessMode: .create)
 
         let allFiles = try collectFiles(from: files)
         let totalFiles = allFiles.count

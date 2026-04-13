@@ -64,7 +64,7 @@ enum ArchiveFormat: String, CaseIterable {
         }
     }
 
-    static func detect(from url: URL) -> ArchiveFormat {
+    nonisolated static func detect(from url: URL) -> ArchiveFormat {
         let ext = url.pathExtension.lowercased()
         let name = url.lastPathComponent.lowercased()
 
