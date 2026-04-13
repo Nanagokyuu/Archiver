@@ -6,14 +6,18 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		91724F8D2F8CDDC000CED01C /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 91724F8C2F8CDDC000CED01C /* ZIPFoundation */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
-		91724F072F8CD04400CED01C /* Unzip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unzip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		91724F072F8CD04400CED01C /* Archiver.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Archiver.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		91724F092F8CD04400CED01C /* Unzip */ = {
+		91724F092F8CD04400CED01C /* Archiver */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Unzip;
+			path = Archiver;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91724F8D2F8CDDC000CED01C /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -32,7 +37,7 @@
 		91724EFE2F8CD04400CED01C = {
 			isa = PBXGroup;
 			children = (
-				91724F092F8CD04400CED01C /* Unzip */,
+				91724F092F8CD04400CED01C /* Archiver */,
 				91724F082F8CD04400CED01C /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,7 +45,7 @@
 		91724F082F8CD04400CED01C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				91724F072F8CD04400CED01C /* Unzip.app */,
+				91724F072F8CD04400CED01C /* Archiver.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +53,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		91724F062F8CD04400CED01C /* Unzip */ = {
+		91724F062F8CD04400CED01C /* Archiver */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 91724F122F8CD04400CED01C /* Build configuration list for PBXNativeTarget "Unzip" */;
+			buildConfigurationList = 91724F122F8CD04400CED01C /* Build configuration list for PBXNativeTarget "Archiver" */;
 			buildPhases = (
 				91724F032F8CD04400CED01C /* Sources */,
 				91724F042F8CD04400CED01C /* Frameworks */,
@@ -61,13 +66,14 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				91724F092F8CD04400CED01C /* Unzip */,
+				91724F092F8CD04400CED01C /* Archiver */,
 			);
-			name = Unzip;
+			name = Archiver;
 			packageProductDependencies = (
+				91724F8C2F8CDDC000CED01C /* ZIPFoundation */,
 			);
 			productName = Unzip;
-			productReference = 91724F072F8CD04400CED01C /* Unzip.app */;
+			productReference = 91724F072F8CD04400CED01C /* Archiver.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -82,10 +88,11 @@
 				TargetAttributes = {
 					91724F062F8CD04400CED01C = {
 						CreatedOnToolsVersion = 26.2;
+						LastSwiftMigration = 2620;
 					};
 				};
 			};
-			buildConfigurationList = 91724F022F8CD04400CED01C /* Build configuration list for PBXProject "Unzip" */;
+			buildConfigurationList = 91724F022F8CD04400CED01C /* Build configuration list for PBXProject "Archiver" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -94,12 +101,15 @@
 			);
 			mainGroup = 91724EFE2F8CD04400CED01C;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				91724F8B2F8CDDC000CED01C /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 91724F082F8CD04400CED01C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				91724F062F8CD04400CED01C /* Unzip */,
+				91724F062F8CD04400CED01C /* Archiver */,
 			);
 		};
 /* End PBXProject section */
@@ -250,6 +260,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -257,7 +268,7 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -272,6 +283,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 			};
@@ -282,14 +294,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 888RK57WJH;
-				ENABLE_APP_SANDBOX = YES;
+				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
-				ENABLE_USER_SELECTED_FILES = readonly;
+				ENABLE_USER_SELECTED_FILES = readwrite;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -312,7 +325,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		91724F022F8CD04400CED01C /* Build configuration list for PBXProject "Unzip" */ = {
+		91724F022F8CD04400CED01C /* Build configuration list for PBXProject "Archiver" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				91724F102F8CD04400CED01C /* Debug */,
@@ -321,7 +334,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		91724F122F8CD04400CED01C /* Build configuration list for PBXNativeTarget "Unzip" */ = {
+		91724F122F8CD04400CED01C /* Build configuration list for PBXNativeTarget "Archiver" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				91724F132F8CD04400CED01C /* Debug */,
@@ -331,6 +344,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		91724F8B2F8CDDC000CED01C /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.20;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		91724F8C2F8CDDC000CED01C /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 91724F8B2F8CDDC000CED01C /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 91724EFF2F8CD04400CED01C /* Project object */;
 }
