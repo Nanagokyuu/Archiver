@@ -34,6 +34,7 @@ actor ArchiveService {
     private func readZipContents(at url: URL) throws -> [ArchiveItem] {
         let archive = try Archive(url: url, accessMode: .read)
 
+        // Use lazy iteration to avoid loading all entries into memory at once
         return archive.compactMap { entry in
             let rawPath = entry.path
             // Re-decode path for CJK support: if the path contains replacement chars,
@@ -210,30 +211,78 @@ actor ArchiveService {
     ) async throws {
         let archive = try Archive(url: archiveURL, accessMode: .read)
 
-        let entries = Array(archive)
-        let totalEntries = entries.count
-        var processedEntries = 0
+        // Collect only lightweight metadata without loading entry data into memory
+        struct EntryMeta: Sendable {
+            let path: String
+            let isDirectory: Bool
+        }
+        let metas: [EntryMeta] = archive.compactMap { entry in
+            EntryMeta(path: decodeCJKPath(entry.path), isDirectory: entry.type == .directory)
+        }
+        let totalEntries = metas.count
+        guard totalEntries > 0 else { return }
 
+        // Pre-create all directories (serial, fast)
         let fileManager = FileManager.default
+        for meta in metas where meta.isDirectory {
+            let fullPath = destination.appendingPathComponent(meta.path)
+            try fileManager.createDirectory(at: fullPath, withIntermediateDirectories: true)
+        }
 
-        for entry in entries {
-            let entryPath = decodeCJKPath(entry.path)
-            let fullPath = destination.appendingPathComponent(entryPath)
+        // Collect file entries for parallel extraction
+        let fileEntries = Array(archive.filter { $0.type != .directory })
+        let totalFiles = max(fileEntries.count, 1)
 
-            if entry.type == .directory {
-                try fileManager.createDirectory(at: fullPath, withIntermediateDirectories: true)
-            } else {
-                let parentDir = fullPath.deletingLastPathComponent()
-                if !fileManager.fileExists(atPath: parentDir.path) {
-                    try fileManager.createDirectory(at: parentDir, withIntermediateDirectories: true)
+        // Throttle: only report when progress advances by more than 0.5%
+        let progressState = ProgressThrottle(threshold: 0.005)
+
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            // Limit concurrency to avoid excessive memory pressure
+            let concurrency = min(totalFiles, ProcessInfo.processInfo.activeProcessorCount * 2)
+            var submitted = 0
+            var completed = 0
+
+            // Seed initial batch
+            for entry in fileEntries.prefix(concurrency) {
+                let entryPath = decodeCJKPath(entry.path)
+                let fullPath = destination.appendingPathComponent(entryPath)
+                group.addTask {
+                    let parentDir = fullPath.deletingLastPathComponent()
+                    if !FileManager.default.fileExists(atPath: parentDir.path) {
+                        try FileManager.default.createDirectory(at: parentDir, withIntermediateDirectories: true)
+                    }
+                    _ = try archive.extract(entry, to: fullPath)
                 }
-                _ = try archive.extract(entry, to: fullPath)
+                submitted += 1
             }
 
-            processedEntries += 1
-            let progress = Double(processedEntries) / Double(totalEntries)
-            progressHandler(progress, entryPath)
+            // Pump remaining tasks as slots free up
+            for try await _ in group {
+                completed += 1
+                if submitted < fileEntries.count {
+                    let entry = fileEntries[submitted]
+                    let entryPath = decodeCJKPath(entry.path)
+                    let fullPath = destination.appendingPathComponent(entryPath)
+                    group.addTask {
+                        let parentDir = fullPath.deletingLastPathComponent()
+                        if !FileManager.default.fileExists(atPath: parentDir.path) {
+                            try FileManager.default.createDirectory(at: parentDir, withIntermediateDirectories: true)
+                        }
+                        _ = try archive.extract(entry, to: fullPath)
+                    }
+                    submitted += 1
+                }
+
+                let progress = Double(completed) / Double(totalFiles)
+                let currentPath = fileEntries[completed - 1].path
+                if progressState.shouldReport(progress) {
+                    progressHandler(progress, decodeCJKPath(currentPath))
+                }
+            }
         }
+
+        // Always report 1.0 at the end
+        progressHandler(1.0, "")
     }
 
     private func extractWithTar(
@@ -263,10 +312,16 @@ actor ArchiveService {
         let files = output.components(separatedBy: "\n").filter { !$0.isEmpty }
         let total = max(files.count, 1)
 
+        // Throttle: only report when progress advances by more than 0.5%
+        let progressState = ProgressThrottle(threshold: 0.005)
         for (index, file) in files.enumerated() {
             let progress = Double(index + 1) / Double(total)
-            progressHandler(progress, file)
+            if progressState.shouldReport(progress) {
+                progressHandler(progress, file)
+            }
         }
+        // Always report 1.0 at the end
+        progressHandler(1.0, "")
 
         process.waitUntilExit()
 
@@ -344,6 +399,31 @@ actor ArchiveService {
             }
         }
         return result
+    }
+}
+
+// MARK: - Progress Throttle
+
+/// Thread-safe progress gate: returns true only when progress has advanced by at least `threshold`.
+final class ProgressThrottle: @unchecked Sendable {
+    private let threshold: Double
+    // Protected by `lock`; marked nonisolated(unsafe) to opt out of default MainActor isolation.
+    private nonisolated(unsafe) var lastReported: Double = -1.0
+    private let lock = NSLock()
+
+    nonisolated init(threshold: Double) {
+        self.threshold = threshold
+        self.lastReported = -1.0
+    }
+
+    nonisolated func shouldReport(_ progress: Double) -> Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        if progress - lastReported >= threshold {
+            lastReported = progress
+            return true
+        }
+        return false
     }
 }
 

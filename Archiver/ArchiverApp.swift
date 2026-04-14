@@ -35,6 +35,13 @@ struct ArchiverApp: App {
     }
 }
 
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+            .environment(ArchiveViewModel())
+    }
+}
+
 
 //      |\      _,,,---,,_
 //ZZZzz /,`.-'`'    -.  ;-;;,_

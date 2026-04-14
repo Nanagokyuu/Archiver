@@ -142,9 +142,14 @@ class ArchiveViewModel {
 
         Task {
             do {
+                // Additional 0.5% UI-layer throttle so rapid bursts from the service
+                // don't saturate the main actor even if the service emits more updates.
+                let uiThrottle = ProgressThrottle(threshold: 0.005)
                 try await service.extract(archiveURL: archiveURL, to: destination) { progress, file in
-                    Task { @MainActor in
-                        self.state = .extracting(progress: progress, currentFile: file)
+                    if uiThrottle.shouldReport(progress) || progress >= 1.0 {
+                        Task { @MainActor in
+                            self.state = .extracting(progress: progress, currentFile: file)
+                        }
                     }
                 }
                 state = .completed(outputPath: destination.path)
@@ -165,6 +170,13 @@ class ArchiveViewModel {
 
         guard panel.runModal() == .OK, !panel.urls.isEmpty else { return }
         let sourceURLs = panel.urls
+
+        compressFiles(droppedURLs: sourceURLs)
+    }
+
+    /// Compress already-known URLs (e.g. from drag-and-drop). Skips the NSOpenPanel.
+    func compressFiles(droppedURLs: [URL]) {
+        let sourceURLs = droppedURLs
 
         let savePanel = NSSavePanel()
         savePanel.title = "Save Archive As"
